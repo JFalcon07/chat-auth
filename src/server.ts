@@ -5,6 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import * as passport from 'passport';
 import { jwtOptions } from './strategies';
 import './strategies';
+import { UserModel } from "./model";
 
 const port = 4000;
 const app = express();
@@ -57,6 +58,14 @@ app.post('/login', async (req, res, next) => {
 
 app.post('/auth',passport.authenticate('jwt',{session: false}),(req,res)=>{
     res.json({authorized: true});
+});
+
+app.post('/changePassword', async (req,res)=>{
+    UserModel.findById({_id: req.body.user}).then(user => {
+        user.password = req.body.change;
+        user.save();
+        res.json({changed: true, value: null});
+    });
 });
 app.listen(port, () => {
     console.log(`Auth Server is up on port ${port}`);
